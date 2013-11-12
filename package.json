@@ -1,0 +1,10 @@
+{
+  "name": "learntocode.eu",
+  "description": "CoderDojo Learn to Code EU website",
+  "version": "0.0.1-dev",
+  "private": true,
+  "dependencies": {
+    "express": "3.x",
+    "mysql": "2.x"
+  }
+}
