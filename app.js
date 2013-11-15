@@ -17,6 +17,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(require('./lib/register'))
 app.use(require('./lib/authenticate'))
 app.use(require('./lib/authenticate/login'))
+app.use(require('./lib/edithtml'))
 
 require('nodetime').profile({
     accountKey: process.env['APPDYNAMICS_KEY'], 

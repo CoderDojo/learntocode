@@ -83,7 +83,7 @@ $('.feature-item').waypoint(function(down){
 }, { offset: '60%' });
 	
 
-/* Carousel */
+/* Carousel 
 
 $('#carousel_container').carouFredSel({
 	responsive: true,
@@ -109,6 +109,8 @@ $('#carousel_container').carouFredSel({
 		}
 	}
 });
+*/
+
 
 /* Navigation Tab */
 /* Tab navigation toggle */

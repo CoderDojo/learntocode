@@ -1,3 +1,5 @@
+var htmlEditor;
+
 function register() {
 	resetMessages();
 	var user = {};
@@ -11,6 +13,7 @@ function register() {
 }
 
 function login() {
+	console.log('Logging in');
 	resetMessages();
 	var user = {};
 	user.password = $("#login_password").val();
@@ -61,7 +64,7 @@ function displayEditors() {
 }
 
 function displayHTMLEditor() {
-	var htmlEditor = CodeMirror(document.getElementById("htmlEditor"), {
+	htmlEditor = CodeMirror(document.getElementById("htmlEditor"), {
       mode: "text/html",
       matchTags: {bothTags: true},
       value: "<div> </div>",
@@ -151,7 +154,25 @@ function displayError(data,errorDiv) {
 }
 
 function saveHtml() {
-	alert('saving....');
+	console.log(htmlEditor.getValue());
+	var html = {};
+	html.email = $.cookie('email'); 
+    html.session_hash = $.cookie('session_hash'); 
+    html.html = htmlEditor.getValue();
+
+    if(html.email && html.session_hash) {
+		html = JSON.stringify(html);
+		ajaxCall('POST', '/api/savehtml', html, successHtmlCode, errorHtmlCode);
+	} 
+}
+
+function successHtmlCode() {
+  console.log('success')
+}
+
+
+function errorHtmlCode() {
+  console.log('error')
 }
 
 function ajaxCall(type, url, data, success, error) {
@@ -171,6 +192,8 @@ function ajaxCall(type, url, data, success, error) {
             }
     });
 }
+	
+
 
 authenticate();
 
