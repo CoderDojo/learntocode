@@ -26,11 +26,20 @@ img.about {
 	display: none;
 }
 
+
 #login_error {
 	display: none;
 }
 
 #login_success {
+	display: none;
+}
+
+#html_error {
+	display: none;
+}
+
+#html_success {
 	display: none;
 }
 
@@ -79,7 +88,6 @@ img.about {
 	width: 25px;
 }
 
-
 .about_box {
 	height: 150px;
 }
@@ -90,4 +98,8 @@ img.about {
 
 .user_box {
 	height: 400px;
+}
+
+.text-error {
+	color: red;
 }

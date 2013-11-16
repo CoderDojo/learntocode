@@ -1,6 +1,7 @@
 var htmlEditor;
 
 function register() {
+	console.log("Registering ............");
 	resetMessages();
 	var user = {};
 	user.name = $("#reg_name").val();
@@ -38,9 +39,11 @@ function authenticate() {
 
 
 function successfulLogin(user) {
-	updateUserInfo(user[0]);
-	resetMessages();
-	resetLogin();
+	if(user[0]) {
+		updateUserInfo(user[0]);
+		resetMessages();
+		resetLogin();
+	}
 }
 
 function updateUserInfo(user) {
@@ -153,8 +156,18 @@ function displayError(data,errorDiv) {
 	errorDiv.append(message)
 }
 
+function resetHtml() {
+	$("#html_error").empty();
+	$("#html_error").hide();
+	$("#html_success").empty();
+	$("#html_success").hide();
+}
+
 function saveHtml() {
 	console.log(htmlEditor.getValue());
+
+	resetHtml()
+
 	var html = {};
 	html.email = $.cookie('email'); 
     html.session_hash = $.cookie('session_hash'); 
@@ -166,13 +179,20 @@ function saveHtml() {
 	} 
 }
 
-function successHtmlCode() {
-  console.log('success')
+function successHtmlCode(data) {
+	var successDiv = $('#html_success')
+	successDiv.show();
+	successDiv.empty();
+	successDiv.append('Successfully updated html');
 }
 
 
-function errorHtmlCode() {
-  console.log('error')
+function errorHtmlCode(data) {
+	var errorDiv = $('#html_error')
+	errorDiv.show();
+	errorDiv.empty();
+	console.log(data.error);
+	displayError(data,errorDiv);
 }
 
 function ajaxCall(type, url, data, success, error) {
