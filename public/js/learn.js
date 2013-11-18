@@ -1,4 +1,5 @@
 var htmlEditor;
+var cssEditor;
 
 function register() {
 	console.log("Registering ............");
@@ -37,6 +38,36 @@ function authenticate() {
 	}
 }
 
+function getUserHtml() {
+	var authenticate = {};
+	authenticate.email = $.cookie('email'); 
+    authenticate.session_hash = $.cookie('session_hash'); 
+
+    if(authenticate.email && authenticate.session_hash) {
+		authenticate = JSON.stringify(authenticate);
+		ajaxCall('POST', '/api/getuserhtml', authenticate, userHtmlReceived, errorHtmlCode);
+	} 
+}
+
+function userHtmlReceived(data) {
+	htmlEditor.setValue(data.success);
+}
+
+
+function getUserCss() {
+	var authenticate = {};
+	authenticate.email = $.cookie('email'); 
+    authenticate.session_hash = $.cookie('session_hash'); 
+
+    if(authenticate.email && authenticate.session_hash) {
+		authenticate = JSON.stringify(authenticate);
+		ajaxCall('POST', '/api/getusercss', authenticate, userCssReceived, errorCssCode);
+	} 
+}
+
+function userCssReceived(data) {
+	cssEditor.setValue(data.success);
+}
 
 function successfulLogin(user) {
 	if(user[0]) {
@@ -49,14 +80,16 @@ function successfulLogin(user) {
 function updateUserInfo(user) {
 	console.log("###### updateUserInfo");
 	console.log(user);
+	$.cookie('email', user.email, { expires: 7 });
+	$.cookie('session_hash', user.session_hash, { expires: 7 });
+	getUserHtml();
+	getUserCss();
 	$("#signuplink").hide();
 	$("#loginlink").hide();
 	$("#signup").hide();
 	$("#login").hide();
 	$("#profile").empty();
 	$("#profile").append(user.name + " | <a onclick='logout()'>Logout</a>");
-	$.cookie('email', user.email, { expires: 7 });
-	$.cookie('session_hash', user.session_hash, { expires: 7 });
 	$("#code").show();
 	displayEditors();
 }
@@ -79,7 +112,7 @@ function displayHTMLEditor() {
 
 
 function displayCSSEditor() {
-	var cssEditor = CodeMirror(document.getElementById("cssEditor"), {
+	cssEditor = CodeMirror(document.getElementById("cssEditor"), {
       mode: "text/css",
       value: "/* write css here */",
       matchBrackets: true,
@@ -189,6 +222,46 @@ function successHtmlCode(data) {
 
 function errorHtmlCode(data) {
 	var errorDiv = $('#html_error')
+	errorDiv.show();
+	errorDiv.empty();
+	console.log(data.error);
+	displayError(data,errorDiv);
+}
+
+
+function resetCss() {
+	$("#css_error").empty();
+	$("#css_error").hide();
+	$("#css_success").empty();
+	$("#css_success").hide();
+}
+
+function saveCss() {
+	console.log(cssEditor.getValue());
+
+	resetCss()
+
+	var css = {};
+	css.email = $.cookie('email'); 
+    css.session_hash = $.cookie('session_hash'); 
+    css.css = cssEditor.getValue();
+
+    if(css.email && css.session_hash) {
+		css = JSON.stringify(css);
+		ajaxCall('POST', '/api/savecss', css, successCssCode, errorCssCode);
+	} 
+}
+
+function successCssCode(data) {
+	var successDiv = $('#css_success')
+	successDiv.show();
+	successDiv.empty();
+	successDiv.append('Successfully updated CSS');
+}
+
+
+function errorCssCode(data) {
+	var errorDiv = $('#css_error')
 	errorDiv.show();
 	errorDiv.empty();
 	console.log(data.error);

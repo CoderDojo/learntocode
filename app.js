@@ -1,8 +1,18 @@
+
+if(process.env['APPDYNAMICS_KEY']) {
+  require('nodetime').profile({
+      accountKey: process.env['APPDYNAMICS_KEY'], 
+      appName: 'learntocode.eu'
+  });
+}
+
 var express = require('express')
 var http = require('http')
 var path = require('path')
 
 var app = express()
+
+
 
 app.use(express.bodyParser());
 app.set('views', __dirname + '/public');
@@ -18,11 +28,9 @@ app.use(require('./lib/register'))
 app.use(require('./lib/authenticate'))
 app.use(require('./lib/authenticate/login'))
 app.use(require('./lib/edithtml'))
-
-require('nodetime').profile({
-    accountKey: process.env['APPDYNAMICS_KEY'], 
-    appName: 'learntocode.eu'
-});
+app.use(require('./lib/editcss'))
+app.use(require('./lib/getuserhtml'))
+app.use(require('./lib/getusercss'))
 
 function handler (req, res) {
   fs.readFile(__dirname + '/index.html',

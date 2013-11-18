@@ -43,6 +43,15 @@ img.about {
 	display: none;
 }
 
+
+#css_error {
+	display: none;
+}
+
+#css_success {
+	display: none;
+}
+
 .brand {
 	font-size: 40px;
 	font-size: 4rem;
