@@ -26,10 +26,8 @@ function login() {
 }
 
 function authenticate() {
-	var authenticate = {};
-	authenticate.email = $.cookie('email'); 
-    authenticate.session_hash = $.cookie('session_hash'); 
-
+	var authenticate = getAuth();
+	
     if(authenticate.email && authenticate.session_hash) {
 		authenticate = JSON.stringify(authenticate);
 		ajaxCall('POST', '/api/authenticate', authenticate, successfulLogin, failedLogin);
@@ -38,10 +36,15 @@ function authenticate() {
 	}
 }
 
-function getUserHtml() {
+function getAuth() {
 	var authenticate = {};
 	authenticate.email = $.cookie('email'); 
-    authenticate.session_hash = $.cookie('session_hash'); 
+    authenticate.session_hash = $.cookie('session_hash');
+    return authenticate;
+}
+
+function getUserHtml() {
+	var authenticate = getAuth();
 
     if(authenticate.email && authenticate.session_hash) {
 		authenticate = JSON.stringify(authenticate);
@@ -55,9 +58,7 @@ function userHtmlReceived(data) {
 
 
 function getUserCss() {
-	var authenticate = {};
-	authenticate.email = $.cookie('email'); 
-    authenticate.session_hash = $.cookie('session_hash'); 
+	var authenticate = getAuth();
 
     if(authenticate.email && authenticate.session_hash) {
 		authenticate = JSON.stringify(authenticate);
@@ -70,6 +71,7 @@ function userCssReceived(data) {
 }
 
 function successfulLogin(user) {
+	console.log("Returned successful login for user " + user);
 	if(user[0]) {
 		updateUserInfo(user[0]);
 		resetMessages();
@@ -80,7 +82,7 @@ function successfulLogin(user) {
 function updateUserInfo(user) {
 	console.log("###### updateUserInfo");
 	console.log(user);
-	$.cookie('email', user.email, { expires: 7 });
+	$.cookie('email', user.email_hash, { expires: 7 });
 	$.cookie('session_hash', user.session_hash, { expires: 7 });
 	getUserHtml();
 	getUserCss();
@@ -268,6 +270,80 @@ function errorCssCode(data) {
 	displayError(data,errorDiv);
 }
 
+function getMembersContribution() {
+	console.log("getMembersContribution");
+	ajaxCall('POST', '/api/gethtml', '', displayLearning, failedLearning);
+}
+
+function displayLearning(data) {
+	console.log("displayLearning");
+	console.log(data.success[0].css.rulelist)
+	var learnElement = $("#memberCode");
+	learnElement.empty();
+	if(data.success) {
+		console.log("displayLearning count: " + data.success.length);
+		for(var htmlRecord = 0; htmlRecord < data.success.length; htmlRecord++) {
+			var html = data.success[htmlRecord];
+			processHtmlResult(html, learnElement);
+			console.log('$$$$$$$$$$$$$$$')
+			console.log(html.css.rulelist)
+			if(html.css.rulelist) {
+				processCss(html.css.rulelist, html.html_uuid);
+			}
+		}
+	}
+}
+
+function processHtmlResult(htmlRecord, learnElement) {
+	var memberDiv = $('<div class="memberSection" id="'+htmlRecord.html_uuid+'">');
+	memberDiv.append(htmlRecord.html);
+	applyBaseCssToDiv(memberDiv);
+	learnElement.append(memberDiv);
+}
+
+function applyBaseCssToDiv(element) {
+	element.css({
+		"border-bottom": "1px solid #ddd",
+		"margin-top": "20px",
+		"width": "100%",
+		"padding": "0px"
+	});
+}
+
+function processCss(cssJson, html_uuid) {
+	if(cssJson) {
+		for(var cssElement = 0; cssElement < cssJson.length; cssElement++) {
+
+			var css = cssJson[cssElement];
+			if(css.type = "style") {
+				var styleElements = $("#"+html_uuid + " " + css.selector);
+				if(styleElements) {
+					applyCssToElements(styleElements,  css.declarations)
+				}
+			}
+		}
+	}
+}
+
+function applyCssToElements(elements, styles) {
+
+	if(elements) {
+		if(elements.length == 1) {
+			elements.css(styles)
+		} else {
+			for(var htmlElement; htmlElement < elements; htmlElement++) {
+				elements[htmlElement].css(styles);
+			}
+		}
+	}
+}
+
+
+function failedLearning(data) {
+	console.log("Failing learning");
+	console.log(data);
+}
+
 function ajaxCall(type, url, data, success, error) {
     $.ajax({
             type : type,
@@ -286,7 +362,6 @@ function ajaxCall(type, url, data, success, error) {
     });
 }
 	
-
-
 authenticate();
+getMembersContribution();
 

@@ -32,9 +32,13 @@ CREATE TABLE `users` (
   `password` varchar(50) NOT NULL DEFAULT '',
   `coderdojo` varchar(50) DEFAULT NULL,
   `city` varchar(50) DEFAULT NULL,
+  `country` varchar(50) DEFAULT NULL,
+  `email_hash` varchar(100) DEFAULT NULL,
   `session_hash` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `EMAIL` (`email`)
+  UNIQUE KEY `EMAIL` (`email`),
+  UNIQUE KEY `SESSION_HASH` (`session_hash`),
+  UNIQUE KEY `EMAIL_HASH` (`email_hash`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 

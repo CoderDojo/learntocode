@@ -112,3 +112,16 @@ img.about {
 .text-error {
 	color: red;
 }
+
+#code {
+	display: none;
+}
+
+#memberCode {
+	width: 100%;
+}
+
+#memberSection {
+	border-radius: 5px;
+	border: 1px solid #ddd;
+}

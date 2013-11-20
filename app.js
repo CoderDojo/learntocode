@@ -31,6 +31,7 @@ app.use(require('./lib/edithtml'))
 app.use(require('./lib/editcss'))
 app.use(require('./lib/getuserhtml'))
 app.use(require('./lib/getusercss'))
+app.use(require('./lib/gethtml'))
 
 function handler (req, res) {
   fs.readFile(__dirname + '/index.html',
