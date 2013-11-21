@@ -298,7 +298,14 @@ function processHtmlResult(htmlRecord, learnElement) {
 	var memberDiv = $('<div class="memberSection" id="'+htmlRecord.html_uuid+'">');
 	memberDiv.append(htmlRecord.html);
 	applyBaseCssToDiv(memberDiv);
+	learnElement.append(createHeader(htmlRecord));
 	learnElement.append(memberDiv);
+}
+
+function createHeader(htmlRecord) {
+	console.log(htmlRecord)
+	var header = '<div class="panel panel-default"><div class="panel-heading"><h2 class="panel-title"><h4><i class="fa fa-user purple"></i>&nbsp;'+ htmlRecord.name + ' - ' + htmlRecord.city + ' - ' + htmlRecord.coderdojo + '</h4></h2></div></div>';
+	return header;
 }
 
 function applyBaseCssToDiv(element) {
@@ -306,6 +313,7 @@ function applyBaseCssToDiv(element) {
 		"border-bottom": "1px solid #ddd",
 		"margin-top": "20px",
 		"width": "100%",
+		"position": "relative",
 		"padding": "0px"
 	});
 }
