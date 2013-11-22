@@ -27,13 +27,11 @@ function login() {
 
 function authenticate() {
 	var authenticate = getAuth();
-	
+	$("#code").hide();
     if(authenticate.email && authenticate.session_hash) {
 		authenticate = JSON.stringify(authenticate);
 		ajaxCall('POST', '/api/authenticate', authenticate, successfulLogin, failedLogin);
-	} else {
-		$("#code").hide();
-	}
+	} 
 }
 
 function getAuth() {
@@ -53,7 +51,7 @@ function getUserHtml() {
 }
 
 function userHtmlReceived(data) {
-	htmlEditor.setValue(data.success);
+	htmlEditor.setValue(htmlUnescape(data.success));
 }
 
 
@@ -74,6 +72,7 @@ function successfulLogin(user) {
 	console.log("Returned successful login for user " + user);
 	if(user[0]) {
 		updateUserInfo(user[0]);
+		$("#code").show();
 		resetMessages();
 		resetLogin();
 	}
@@ -202,16 +201,26 @@ function saveHtml() {
 	console.log(htmlEditor.getValue());
 
 	resetHtml()
-
+	
 	var html = {};
 	html.email = $.cookie('email'); 
     html.session_hash = $.cookie('session_hash'); 
-    html.html = htmlEditor.getValue();
+    html.html = escapePreTags(htmlEditor.getValue());
 
     if(html.email && html.session_hash) {
 		html = JSON.stringify(html);
 		ajaxCall('POST', '/api/savehtml', html, successHtmlCode, errorHtmlCode);
 	} 
+}
+
+function escapePreTags(html) {
+
+	var htmlElement = $(html);
+	var preElement = htmlElement.find('pre').html();
+	var escapedHtml = htmlEscape(preElement);
+
+    htmlElement.html($(htmlElement).html().replace(preElement, escapedHtml));
+    return htmlElement.html();
 }
 
 function successHtmlCode(data) {
@@ -352,6 +361,24 @@ function failedLearning(data) {
 	console.log(data);
 }
 
+function htmlEscape(htmlToEscape) {
+    return String(htmlToEscape)
+            .replace(/&/g, '&amp;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+}
+
+function htmlUnescape(htmlString){
+    return String(htmlString)
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'")
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&amp;/g, '&');
+}
+
 function ajaxCall(type, url, data, success, error) {
     $.ajax({
             type : type,
@@ -369,6 +396,8 @@ function ajaxCall(type, url, data, success, error) {
             }
     });
 }
+
+
 	
 authenticate();
 getMembersContribution();
