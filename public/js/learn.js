@@ -198,7 +198,6 @@ function resetHtml() {
 }
 
 function saveHtml() {
-	console.log(htmlEditor.getValue());
 
 	resetHtml()
 	
@@ -210,6 +209,19 @@ function saveHtml() {
     if(html.email && html.session_hash) {
 		html = JSON.stringify(html);
 		ajaxCall('POST', '/api/savehtml', html, successHtmlCode, errorHtmlCode);
+	} 
+}
+
+
+function publishUnpublish() {
+
+	resetHtml()
+	
+	var auth = getAuth()
+	
+    if(auth.email && auth.session_hash) {
+		auth = JSON.stringify(auth);
+		ajaxCall('POST', '/api/publish', auth, successHtmlCode, errorHtmlCode);
 	} 
 }
 
