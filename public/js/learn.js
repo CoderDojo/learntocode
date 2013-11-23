@@ -206,7 +206,7 @@ function saveHtml() {
     html.session_hash = $.cookie('session_hash'); 
     var escapedHtml = escapePreTags(htmlEditor.getValue());
     html.html = HTMLtoXML(escapedHtml);
-    htmlEditor.setValue(html.html);
+    htmlEditor.setValue(htmlUnescape(html.html));
     if(html.email && html.session_hash) {
 		html = JSON.stringify(html);
 		ajaxCall('POST', '/api/savehtml', html, successHtmlCode, errorHtmlCode);
