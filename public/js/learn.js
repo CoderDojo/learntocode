@@ -204,8 +204,9 @@ function saveHtml() {
 	var html = {};
 	html.email = $.cookie('email'); 
     html.session_hash = $.cookie('session_hash'); 
-    html.html = escapePreTags(htmlEditor.getValue());
-
+    var escapedHtml = escapePreTags(htmlEditor.getValue());
+    html.html = HTMLtoXML(escapedHtml);
+    htmlEditor.setValue(html.html);
     if(html.email && html.session_hash) {
 		html = JSON.stringify(html);
 		ajaxCall('POST', '/api/savehtml', html, successHtmlCode, errorHtmlCode);
@@ -227,7 +228,7 @@ function publishUnpublish() {
 
 function escapePreTags(html) {
 
-	var htmlElement = $(html);
+	var htmlElement = $('<div>'+html+'</div>');
 	var preElement = htmlElement.find('pre').html();
 	var escapedHtml = htmlEscape(preElement);
 
