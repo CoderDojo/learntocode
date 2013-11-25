@@ -1,8 +1,8 @@
 var htmlEditor;
 var cssEditor;
+var html_uuid;
 
 function register() {
-	console.log("Registering ............");
 	resetMessages();
 	var user = {};
 	user.name = $("#reg_name").val();
@@ -15,7 +15,6 @@ function register() {
 }
 
 function login() {
-	console.log('Logging in');
 	resetMessages();
 	var user = {};
 	user.password = $("#login_password").val();
@@ -25,10 +24,30 @@ function login() {
 	ajaxCall('POST', '/api/login', user, successfulLogin, failedLogin);
 }
 
+function lostpassword() {
+	resetMessages();
+	var user = {};
+	user.email = $("#lost_email").val();
+	user = JSON.stringify(user);
+	console.log(user);
+	ajaxCall('POST', '/api/lostpassword', user, successfulPasswordReset, failedPasswordReset);
+}
+
+function successfulPasswordReset() {
+	$("#lost_success").show();
+	$("#lost_success").append("Successfully reset your password, you should have received an email")
+}
+
+function failedPasswordReset(data) {
+	$("#lost_error").append(data.error);
+}
+
+
 function authenticate() {
 	var authenticate = getAuth();
 	$("#code").hide();
     if(authenticate.email && authenticate.session_hash) {
+    	console.log("Auth ------------------------------")
 		authenticate = JSON.stringify(authenticate);
 		ajaxCall('POST', '/api/authenticate', authenticate, successfulLogin, failedLogin);
 	} 
@@ -51,7 +70,7 @@ function getUserHtml() {
 }
 
 function userHtmlReceived(data) {
-	htmlEditor.setValue(htmlUnescape(data.success));
+	htmlEditor.setValue(htmlUnescape(data.success.html));
 }
 
 
@@ -69,8 +88,10 @@ function userCssReceived(data) {
 }
 
 function successfulLogin(user) {
+	console.log("Auth ------------------------------2")
 	console.log("Returned successful login for user " + user);
 	if(user[0]) {
+		console.log("Auth ------------------------------3")
 		updateUserInfo(user[0]);
 		$("#code").show();
 		resetMessages();
@@ -92,6 +113,7 @@ function updateUserInfo(user) {
 	$("#profile").empty();
 	$("#profile").append(user.name + " | <a onclick='logout()'>Logout</a>");
 	$("#code").show();
+	$("#htmlEditor").empty();
 	displayEditors();
 }
 
@@ -130,7 +152,11 @@ function resetMessages() {
 	$('#reg_success').empty();
 	$('#login_error').empty();
 	$('#login_success').empty();
+	$('#lost_error').empty();
+	$('#lost_success').empty();
 }
+
+
 
 function logout() {
 	$.removeCookie('email');
@@ -147,6 +173,8 @@ function resetLogin() {
 }
 
 function failedLogin(data) {
+	console.log("+++++++++++++++++")
+	console.log(data)
 	var errorDiv = $('#login_error')
 	errorDiv.show();
 	errorDiv.empty();
@@ -188,6 +216,7 @@ function displayError(data,errorDiv) {
 	
 	message += '</ul>'
 	errorDiv.append(message)
+
 }
 
 function resetHtml() {
@@ -292,6 +321,42 @@ function errorCssCode(data) {
 	displayError(data,errorDiv);
 }
 
+function getPreview() {
+	$("#usercode").empty();
+	var authenticate = getAuth();
+	authenticate = JSON.stringify(authenticate);
+	ajaxCall('POST', '/api/getuserhtml', authenticate, displayPreview, failedPreview);
+}
+
+function displayPreview(data) {
+	html_uuid=data.success.html_uuid;
+	$("#usercode").append("<div id="+html_uuid+">"+htmlUnescape(data.success.html)+"</div>");
+	
+	console.log("0000 " + html_uuid);
+	getPreviewCss();
+}
+
+function failedPreview(data) {
+	console.log(data)
+}
+
+function getPreviewCss() {
+	var authenticate = getAuth();
+
+    if(authenticate.email && authenticate.session_hash) {
+		authenticate = JSON.stringify(authenticate);
+		ajaxCall('POST', '/api/getuserjsoncss', authenticate, displayPreviewCss, failedPreviewCss);
+	} 
+}
+
+function displayPreviewCss(data) {
+	processCss(data.success.rulelist, html_uuid);
+}
+
+function failedPreviewCss(data) {
+	console.log(data)
+}
+
 function getMembersContribution() {
 	console.log("getMembersContribution");
 	ajaxCall('POST', '/api/gethtml', '', displayLearning, failedLearning);
@@ -307,8 +372,6 @@ function displayLearning(data) {
 		for(var htmlRecord = 0; htmlRecord < data.success.length; htmlRecord++) {
 			var html = data.success[htmlRecord];
 			processHtmlResult(html, learnElement);
-			console.log('$$$$$$$$$$$$$$$')
-			console.log(html.css.rulelist)
 			if(html.css.rulelist) {
 				processCss(html.css.rulelist, html.html_uuid);
 			}
@@ -341,6 +404,8 @@ function applyBaseCssToDiv(element) {
 }
 
 function processCss(cssJson, html_uuid) {
+	console.log(cssJson)
+	console.log(html_uuid)
 	if(cssJson) {
 		for(var cssElement = 0; cssElement < cssJson.length; cssElement++) {
 
@@ -392,6 +457,11 @@ function htmlUnescape(htmlString){
         .replace(/&amp;/g, '&');
 }
 
+function cssFocus() {
+	cssEditor.setCursor(1);
+	cssEditor.focus();
+}
+
 function ajaxCall(type, url, data, success, error) {
     $.ajax({
             type : type,
@@ -403,14 +473,22 @@ function ajaxCall(type, url, data, success, error) {
             },
             dataType : "json",
             contentType : 'application/json',
-            error : function(jqXHR, textStatus, errorThrown) {
-        	   var response = jQuery.parseJSON(jqXHR.responseText)
-               error(response)     
+            error : function(jqXHR, textStatus, errorThrown) {	
+               console.log(jqXHR)
+               try {
+	               	if(jqXHR.responseJSON) {
+	               	   console.log("Error returned "+jqXHR.responseJSON.error)
+		               error(jqXHR.responseJSON) 
+		            } else {
+		            	var response = jQuery.parseJSON(jqXHR.responseText)
+		                error(response) 
+		            }
+	            } catch (err) {
+	            	console.log(err);
+	            }
             }
     });
 }
-
-
 	
 authenticate();
 getMembersContribution();

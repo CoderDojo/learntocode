@@ -12,8 +12,6 @@ var path = require('path')
 
 var app = express()
 
-
-
 app.use(express.bodyParser());
 app.set('views', __dirname + '/public');
 app.set('view engine', 'html');
@@ -33,6 +31,8 @@ app.use(require('./lib/getuserhtml'))
 app.use(require('./lib/getusercss'))
 app.use(require('./lib/gethtml'))
 app.use(require('./lib/publish'))
+app.use(require('./lib/lostpassword'))
+//app.use(require('./lib/userpreview'))
 
 function handler (req, res) {
   fs.readFile(__dirname + '/index.html',

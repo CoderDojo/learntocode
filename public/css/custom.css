@@ -114,7 +114,7 @@ img.about {
 }
 
 #code {
-	display: none;
+	display: block;
 }
 
 #memberCode {
@@ -124,4 +124,24 @@ img.about {
 #memberSection {
 	border-radius: 5px;
 	border: 1px solid #ddd;
+}
+
+#lost_error {
+	display: none;
+}
+
+#lost_success {
+	display: none;
+}
+
+#lostPassword {
+	margin-top: 20px;
+}
+
+#panel-heading {
+	margin-top: 20px;
+}
+
+input {
+	margin-bottom: 10px;
 }

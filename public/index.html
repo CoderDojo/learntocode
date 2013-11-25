@@ -310,11 +310,10 @@
 						<div class="sign-up user_box">
 							<h3><i class="fa fa-user green"></i> &nbsp;Sign Up for New Account</h3>
 							<!-- Sign up Form Start -->
-							<form class="form-horizontal" role="form">
 								<p id="reg_error" class="text-error">error</p>
 								<p id="reg_success" class="text-success">success</p>
 								<div class="form-group">
-									<label for="Name" class="col-lg-3 control-label">Name</label>
+									<label for="Name" class="col-lg-3 control-label">First Name</label>
 									<div class="col-lg-9">
 										<input type="text" class="form-control" id="reg_name" required>
 									</div>
@@ -346,11 +345,10 @@
 								
 								<div class="form-group">
 									<div class="col-lg-offset-3 col-lg-9">
-										<button onclick="register()" class="btn btn-info">Sign Up</button>&nbsp;
+										<button onclick="register()" class="btn btn-success">Sign Up</button>&nbsp;
 										
 									</div>
 								</div>
-							</form>
 							
 						</div>
 					</div>
@@ -360,7 +358,6 @@
 						<div class="sign-in user_box">
 							<h3><i class="fa fa-user red"></i> &nbsp;Sign In</h3>
 							<!-- Sign in Form Start -->
-							<form class="form-horizontal" role="form">
 								<p id="login_error" class="text-error">error</p>
 								<p id="login_success" class="text-success">success</p>	
 								<div class="form-group">
@@ -380,7 +377,25 @@
 										<button onclick="login()" class="btn btn-info">Login</button>
 									</div>
 								</div>
-							</form>
+								<div id="lostPasswordDiv">
+								<h3 id="lostPassword"><i class="fa fa-user red"></i> &nbsp;Lost Password</h3>
+							<!-- Sign in Form Start -->
+							<form class="form-horizontal" role="form">
+								<p id="lost_error" class="text-error">error</p>
+								<p id="lost_success" class="text-success">success</p>	
+								<div class="form-group">
+									<label for="Email" class="col-lg-3 control-label">Email</label>
+									<div class="col-lg-9">
+										<input type="text" class="form-control" id="lost_email" required/>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-lg-offset-3 col-lg-9">
+										<button onclick="lostpassword()" class="btn btn-danger">Reset Password</button>
+									</div>
+								</div>
+								</div>
+
 							
 						</div>
 					</div>
@@ -409,9 +424,9 @@
 				<div class="nav-tab">
 					<ul id="mytab" class="nav nav-tabs nav-justified">
 						<li class="active"><a href="#one" data-toggle="tab"><i class="fa fa-gift lblue"></i> HTML</a></li>
-						<li><a href="#two" data-toggle="tab"><i class="fa fa-laptop red"></i> CSS</a></li>
-						<li><a href="#three" data-toggle="tab"><i class="fa fa-user green"></i> Help</a></li>
-						
+						<li><a href="#two" data-toggle="tab" onclick="cssFocus()"><i class="fa fa-laptop red"></i> CSS</a></li>
+						<li><a href="#three" data-toggle="tab" onclick="getPreview()"><i class="fa fa-user green"></i> Preview</a></li>
+						<li><a href="#four" data-toggle="tab"><i class="fa fa-question green"></i> Help</a></li>
 					</ul>
 					<div class="tab-content">
 						<div class="tab-pane fade in active" id="one">
@@ -428,7 +443,7 @@
 									<br/>
 										<button onclick="saveHtml()" class="btn btn-info">Save</button>
 
-										<button onclick="publishUnpublish()" class="btn btn-info">Publish /  Unpublish</button>
+										<button onclick="publishUnpublish()" class="btn btn-success">Publish /  Unpublish</button>
 								</div>
 								<div class="col-md-4 col-sm-4">
 									<div class="ctext-one">
@@ -464,7 +479,7 @@
 							<h2><span>Write your CSS code here</span></h2>
 							<div class="row">
 								<div class="col-md-8 col-sm-8">
-									<h3>Start writing cool CSS here</h3>
+									<h3>Start writing cool CSS here by clicking on box and hit ENTER</h3>
 									<p id="css_error" class="text-error">error</p>
 								    <p id="css_success" class="text-success">success</p>
 									<div class="ctext-one" id="cssEditor">
@@ -502,8 +517,26 @@
 							</div>
 						</div>
 						</div>
-						
+
 						<div class="tab-pane fade" id="three">
+							<h2><span>Preview</span></h2>
+							<div class="row">
+								<div class="col-md-4 col-sm-4">
+									<div class="c-item">
+										<h4>You must have saved it first</h4>
+									</div>
+								</div>
+								
+							</div>
+							<div class="row">
+								<div id="usercode">
+									
+								</div>
+								
+							</div>
+						</div>
+						
+						<div class="tab-pane fade" id="four">
 							<h2><span>Help</span></h2>
 							<div class="row">
 								<div class="col-md-4 col-sm-4">
