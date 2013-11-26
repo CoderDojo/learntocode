@@ -1,6 +1,7 @@
 var htmlEditor;
 var cssEditor;
 var html_uuid;
+var published = false;
 
 function register() {
 	resetMessages();
@@ -70,6 +71,7 @@ function getUserHtml() {
 }
 
 function userHtmlReceived(data) {
+	handlePublishButton(data.success.publish)
 	htmlEditor.setValue(htmlUnescape(data.success.html));
 }
 
@@ -111,7 +113,7 @@ function updateUserInfo(user) {
 	$("#signup").hide();
 	$("#login").hide();
 	$("#profile").empty();
-	$("#profile").append(user.name + " | <a onclick='logout()'>Logout</a>");
+	$("#profile").append(user.name + " | <a onclick='logout()' id='logout'>Logout</a>");
 	$("#code").show();
 	$("#htmlEditor").empty();
 	displayEditors();
@@ -123,6 +125,7 @@ function displayEditors() {
 }
 
 function displayHTMLEditor() {
+	$("#htmlEditor").empty();
 	htmlEditor = CodeMirror(document.getElementById("htmlEditor"), {
       mode: "text/html",
       matchTags: {bothTags: true},
@@ -135,6 +138,7 @@ function displayHTMLEditor() {
 
 
 function displayCSSEditor() {
+	$("#cssEditor").empty();
 	cssEditor = CodeMirror(document.getElementById("cssEditor"), {
       mode: "text/css",
       value: "/* write css here */",
@@ -173,12 +177,9 @@ function resetLogin() {
 }
 
 function failedLogin(data) {
-	console.log("+++++++++++++++++")
-	console.log(data)
 	var errorDiv = $('#login_error')
 	errorDiv.show();
 	errorDiv.empty();
-	console.log(data.error);
 	displayError(data,errorDiv);
 	$("#code").hide();
 }
@@ -202,7 +203,6 @@ function failedRegistation(data) {
 	var errorDiv = $('#reg_error')
 	errorDiv.show();
 	errorDiv.empty();
-	console.log(data.error);
 	displayError(data,errorDiv);
 }
 
@@ -251,7 +251,7 @@ function publishUnpublish() {
 	
     if(auth.email && auth.session_hash) {
 		auth = JSON.stringify(auth);
-		ajaxCall('POST', '/api/publish', auth, successHtmlCode, errorHtmlCode);
+		ajaxCall('POST', '/api/publish', auth, successPublishCode, errorHtmlCode);
 	} 
 }
 
@@ -265,11 +265,24 @@ function escapePreTags(html) {
     return htmlElement.html();
 }
 
+function successPublishCode(data) {
+	if(published==1)
+		handlePublishButton(0)
+	else
+		handlePublishButton(1)
+	var successDiv = $('#html_success')
+	successDiv.show();
+	successDiv.empty();
+	successDiv.append(data);
+	getMembersContribution();
+}
+
 function successHtmlCode(data) {
 	var successDiv = $('#html_success')
 	successDiv.show();
 	successDiv.empty();
-	successDiv.append('Successfully updated html');
+	successDiv.append(data);
+	getMembersContribution();
 }
 
 
@@ -277,7 +290,6 @@ function errorHtmlCode(data) {
 	var errorDiv = $('#html_error')
 	errorDiv.show();
 	errorDiv.empty();
-	console.log(data.error);
 	displayError(data,errorDiv);
 }
 
@@ -290,7 +302,6 @@ function resetCss() {
 }
 
 function saveCss() {
-	console.log(cssEditor.getValue());
 
 	resetCss()
 
@@ -310,6 +321,7 @@ function successCssCode(data) {
 	successDiv.show();
 	successDiv.empty();
 	successDiv.append('Successfully updated CSS');
+	getMembersContribution();
 }
 
 
@@ -330,9 +342,8 @@ function getPreview() {
 
 function displayPreview(data) {
 	html_uuid=data.success.html_uuid;
-	$("#usercode").append("<div id="+html_uuid+">"+htmlUnescape(data.success.html)+"</div>");
+	$("#usercode").append("<div class='userContent' id="+html_uuid+">"+data.success.html+"</div>");
 	
-	console.log("0000 " + html_uuid);
 	getPreviewCss();
 }
 
@@ -365,6 +376,7 @@ function getMembersContribution() {
 function displayLearning(data) {
 	console.log("displayLearning");
 	console.log(data.success[0].css.rulelist)
+
 	var learnElement = $("#memberCode");
 	learnElement.empty();
 	if(data.success) {
@@ -377,6 +389,15 @@ function displayLearning(data) {
 			}
 		}
 	}
+}
+
+function handlePublishButton(publish) {
+	console.log("Publishing shares  " + publish)
+	published = publish;
+	if(published == 1) 
+		$("#publish").text("Unpublish")
+	else 
+		$("#publish").text("Publish")
 }
 
 function processHtmlResult(htmlRecord, learnElement) {
@@ -411,6 +432,7 @@ function processCss(cssJson, html_uuid) {
 
 			var css = cssJson[cssElement];
 			if(css.type = "style") {
+				console.log("$(#"+html_uuid + " " + css.selector+ ") - " +css.selector+" - "+css.declarations);
 				var styleElements = $("#"+html_uuid + " " + css.selector);
 				if(styleElements) {
 					applyCssToElements(styleElements,  css.declarations)
@@ -421,15 +443,8 @@ function processCss(cssJson, html_uuid) {
 }
 
 function applyCssToElements(elements, styles) {
-
 	if(elements) {
-		if(elements.length == 1) {
-			elements.css(styles)
-		} else {
-			for(var htmlElement; htmlElement < elements; htmlElement++) {
-				elements[htmlElement].css(styles);
-			}
-		}
+		elements.css(styles);
 	}
 }
 

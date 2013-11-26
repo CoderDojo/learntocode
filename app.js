@@ -1,8 +1,15 @@
 
 if(process.env['APPDYNAMICS_KEY']) {
-  require('nodetime').profile({
+  var nodetime = require('nodetime').profile({
       accountKey: process.env['APPDYNAMICS_KEY'], 
-      appName: 'learntocode.eu'
+      appName: 'learntocode.eu',
+      features: {
+        transactionProfiler: true,
+        hostMetrics: true,
+      },
+      namedTransactions: {
+        'api transactions': '/api'
+      }
   });
 }
 
@@ -20,6 +27,7 @@ app.use(express.favicon());
 app.use(express.logger('dev'));
 app.use(express.methodOverride());
 app.use(app.router);
+app.use(express.errorHandler()); 
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(require('./lib/register'))
@@ -41,10 +49,13 @@ function handler (req, res) {
       res.writeHead(500);
       return res.end('Error loading index.html');
     }
+    app.use(nodetime.expressErrorHandler());
     res.writeHead(200);
     res.end(data);
   });
 }
+
+
 
 var server = app.listen(app.get('port'), function(){
   console.log("learntocode.eu server listening on port " + app.get('port'));

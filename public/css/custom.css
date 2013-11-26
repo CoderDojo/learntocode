@@ -145,3 +145,15 @@ img.about {
 input {
 	margin-bottom: 10px;
 }
+
+.memberSection {
+	border-bottom: thin solid navy !important;
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+#logout {
+	color: white;
+	font-weight: bold;
+	text-decoration: underline;
+}
