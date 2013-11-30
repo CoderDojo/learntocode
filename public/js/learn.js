@@ -259,9 +259,11 @@ function escapePreTags(html) {
 
 	var htmlElement = $('<div>'+html+'</div>');
 	var preElement = htmlElement.find('pre').html();
-	var escapedHtml = htmlEscape(preElement);
-
-    htmlElement.html($(htmlElement).html().replace(preElement, escapedHtml));
+	for(var count = 0; count < htmlElement.find('pre').length; count++) {
+		preElement = $(htmlElement.find('pre')[count]).html();
+		var escapedHtml = htmlEscape(preElement);
+	    htmlElement.html($(htmlElement).html().replace(preElement, escapedHtml));
+	}
     return htmlElement.html();
 }
 
