@@ -35,6 +35,7 @@ CREATE TABLE `users` (
   `country` varchar(50) DEFAULT NULL,
   `email_hash` varchar(100) DEFAULT NULL,
   `session_hash` varchar(100) DEFAULT NULL,
+  `enabled` BIT DEFAULT 1;
   `publish` BIT DEFAULT 0,
   PRIMARY KEY (`id`),
   UNIQUE KEY `EMAIL` (`email`),
